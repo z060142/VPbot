@@ -1,0 +1,148 @@
+# 遊戲職位管理自動化腳本系統配置
+
+# 核心設定
+core:
+  max_retry_count: 3           # 最大重試次數
+  log_level: "INFO"            # 日誌級別 (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  data_dir: "data/"            # 數據目錄
+
+# 遊戲程式設定
+game:
+  game_path: "C:\\Users\\Bigspring\\AppData\\Local\\TheLastWar\\Launch.exe"  # 遊戲路徑，請根據實際情況修改
+  process_name: "LastWar.exe"  # 進程名稱
+  window_title: "Last War-Survival Game"      # 窗口標題
+  max_runtime: 28800           # 最大運行時間(秒)，8小時
+  position:                    # 窗口位置和大小
+    x: 299                     # 左上角X坐標
+    y: 200                     # 左上角Y坐標
+    width: 1920                # 窗口寬度
+    height: 1080                # 窗口高度
+  force_window_position: true  # 是否強制設置窗口位置和大小
+  window_position_check_interval: 10  # 檢查並調整窗口位置的間隔(秒)
+  startup_wait_time: 30        # 啟動後的穩定等待時間(秒)
+
+# 圖像檢測設定
+image_detection:
+  screen_refresh_interval: 0.1  # 屏幕刷新間隔(秒)
+  default_threshold: 0.8        # 默認匹配閾值
+  # 各類圖像的特定閾值
+  thresholds:
+    error_dialog: 0.9
+    maintenance_notice: 0.85
+    popup_ad: 0.75
+
+# 職位設定
+positions:
+  - id: "position_1"
+    name: "職位1"
+    enabled: true
+    application_region: [100, 150, 400, 300]  # x, y, width, height
+    time_region: [500, 150, 100, 30]         # 時間顯示區域 [x, y, width, height]
+    overtime_threshold: 10  # 超時閾值(分鐘)
+    
+  - id: "position_2"
+    name: "職位2"
+    enabled: true
+    application_region: [100, 200, 400, 300]
+    time_region: [500, 150, 100, 30]         # 時間顯示區域 [x, y, width, height]
+    overtime_threshold: 10
+    
+  - id: "position_3"
+    name: "職位3"
+    enabled: true
+    application_region: [100, 250, 400, 300]
+    time_region: [500, 150, 100, 30]
+    overtime_threshold: 10
+    
+  - id: "position_4"
+    name: "職位4"
+    enabled: true
+    application_region: [100, 300, 400, 300]
+    time_region: [500, 150, 100, 30]
+    overtime_threshold: 10
+    
+  - id: "position_5"
+    name: "職位5"
+    enabled: true
+    application_region: [100, 350, 400, 300]
+    time_region: [500, 150, 100, 30]
+    overtime_threshold: 10
+    
+  - id: "position_6"
+    name: "職位6"
+    enabled: true
+    application_region: [100, 400, 400, 300]
+    time_region: [500, 150, 100, 30]
+    overtime_threshold: 10
+
+# 任務排程設定
+tasks:
+  process_applications:
+    interval_minutes: 5
+    enabled: true
+    priority: 80
+    backoff_minutes: 2      # 連續失敗後的延遲增加(分鐘)
+    max_failures: 5         # 最大連續失敗次數
+  
+  check_overtime:
+    interval_seconds: 30
+    enabled: true
+    priority: 70
+    backoff_minutes: 5
+    max_failures: 3
+  
+  scheduled_restart:
+    execution_time: "04:00"  # 指定執行時間(24小時制)
+    enabled: true
+    priority: 100
+
+# 遠端控制設定
+remote_control:
+  enabled: true
+  server_url: "https://aa.bdmc.live:9753"
+  client_key: "96829ba427be5af9391e4c2c3f8b36696ed170c32e0ccc746e70f8e136c084277346eb361a40453b6483ffa73fe92e4d9766752d0b978bba9b7f89e1fcb55a76"
+
+# OCR設定
+ocr:
+  tesseract_path: "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"  # Tesseract安裝路徑(Windows)
+  preprocessing: true        # 是否進行圖像預處理以提高OCR準確率
+  debug_save_images: false   # 是否保存時間區域截圖用於調試
+
+# 快捷鍵設定
+hotkeys:
+  toggle_all: "f9"              # 暫停/恢復所有功能
+  toggle_scheduler: "f10"       # 暫停/恢復排程
+  toggle_detection: "f11"       # 暫停/恢復檢測
+  emergency_stop: "f12"         # 緊急停止所有操作
+  restart_task: "ctrl+f9"       # 重啟當前任務
+  skip_task: "ctrl+f10"         # 跳過當前任務
+  force_refresh: "ctrl+f11"     # 強制刷新檢測
+  toggle_status: "ctrl+shift+s" # 切換狀態顯示
+
+# 例外處理設定
+exceptions:
+  # 伺服器維護檢測
+  maintenance:
+    template: "exceptions/maintenance_notice.png"
+    threshold: 0.85
+    check_interval: 60  # 檢查間隔(秒)
+  
+  # 異地登入檢測
+  remote_login:
+    template: "exceptions/remote_login.png"
+    threshold: 0.9
+    check_interval: 30
+  
+  # 彈窗廣告檢測
+  popup_ad:
+    templates:
+      - "exceptions/popup_ad_1.png"
+      - "exceptions/popup_ad_2.png"
+    threshold: 0.8
+    check_interval: 20
+  
+  # 網絡錯誤檢測
+  network_error:
+    template: "exceptions/network_error.png"
+    threshold: 0.9
+    check_interval: 30
